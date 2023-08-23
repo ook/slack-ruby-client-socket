@@ -5,13 +5,6 @@ module Slack
     module_function
 
     attr_accessor :token, :logger
-
-    def reset
-      self.token = nil
-      self.logger = nil
-    end
-
-    reset
   end
 
   class << self
