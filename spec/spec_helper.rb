@@ -1,12 +1,11 @@
 # frozen_string_literal: true
 
-require 'rubygems'
-require 'rspec'
+require "rubygems"
+require "rspec"
 
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..'))
+$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), ".."))
 
 require "slack-ruby-client-socket"
-
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure

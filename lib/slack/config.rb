@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 module Slack
   module Config
-    extend self
+    module_function
 
     attr_accessor :token, :logger
 
