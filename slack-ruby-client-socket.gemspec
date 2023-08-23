@@ -4,7 +4,7 @@ require_relative "lib/slack/ruby/client/socket/version"
 
 Gem::Specification.new do |spec|
   spec.name = "slack-ruby-client-socket"
-  spec.version = Slack::Ruby::Client::Socket::VERSION
+  spec.version = Slack::VERSION
   spec.authors = ["Thomas Lecavelier"]
   spec.email = ["thomas@lecavelier.name"]
 
@@ -29,8 +29,7 @@ Gem::Specification.new do |spec|
   spec.executables = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  # Uncomment to register a new dependency of your gem
-  # spec.add_dependency "example-gem", "~> 1.0"
+  spec.add_dependency 'async-websocket', '~> 0.25.1'
 
   # For more information and examples about making a new gem, check out our
   # guide at: https://bundler.io/guides/creating_gem.html
