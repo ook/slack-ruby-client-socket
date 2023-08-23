@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "lib/slack/ruby/client/socket/version"
+require_relative "lib/slack/version"
 
 Gem::Specification.new do |spec|
   spec.name = "slack-ruby-client-socket"
