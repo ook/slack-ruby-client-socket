@@ -2,7 +2,7 @@
 
 module Slack
   module Config
-    module_function
+    extend self
 
     attr_accessor :token, :logger
   end

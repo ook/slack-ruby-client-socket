@@ -1,19 +1,15 @@
 AllCops:
+  NewCops: enable
   TargetRubyVersion: 2.6
+
+Style/ModuleFunction:
+  Enabled: false
 
 Naming/FileName:
   Enabled: false
 
 Style/Documentation:
   Enabled: false
-
-Style/StringLiterals:
-  Enabled: true
-  EnforcedStyle: double_quotes
-
-Style/StringLiteralsInInterpolation:
-  Enabled: true
-  EnforcedStyle: double_quotes
 
 Layout/LineLength:
   Max: 120
