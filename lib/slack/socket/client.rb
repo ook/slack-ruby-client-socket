@@ -10,19 +10,19 @@ module Slack
       include Api::Options
       include Api::Endpoints
 
-      def connect!(handler, auto_acknowledge: true, debug: false)
+      def initialize(debug: false)
+        @debug = debug
+      end
+
+      def connect!(handler, auto_acknowledge: true)
         # Should put a trap on sig INT to stop this loop
         loop do
-          endpoint = Async::HTTP::Endpoint.parse(slack_socket_url(debug: debug))
-
           Async do
             Async::WebSocket::Client.connect(endpoint) do |socket|
               @socket = socket
               handler.on_connection
-              puts 'enter loop'
 
               while (message = socket.read)
-                puts 'read something'
                 message = JSON.parse(message.buffer)
                 acknowledge_message(message['envelope_id']) if auto_acknowledge
 
@@ -70,6 +70,10 @@ module Slack
         socket.flush
       end
 
+      def endpoint
+        Async::HTTP::Endpoint.parse(slack_socket_url(debug: @debug))
+      end
+
       def slack_socket_url(debug: false)
         url = nil
         Async do
@@ -80,10 +84,8 @@ module Slack
         ensure
           client.close
         end
-        url += '&debug_reconnects=true' if debug
-        url
+        debug ? "#{url}&debug_reconnects=true" : url
       end
-
     end
   end
 end
