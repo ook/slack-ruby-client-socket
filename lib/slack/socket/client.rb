@@ -10,44 +10,21 @@ module Slack
       include Api::Options
       include Api::Endpoints
 
-      def slack_socket_url(debug: false)
-        @slack_socket_url ||= begin
-          Async do
-            client = Async::HTTP::Internet.new
-            response = client.post('https://slack.com/api/apps.connections.open',
-                                   [['accept', 'application/json'], ['authorization', "Bearer #{Slack::Config.token}"]])
-            @slack_socket_url = JSON.parse(response.read)['url']
-            @slack_socket_url += '#&debug_reconnects=true' if debug
-          ensure
-            client.close
-          end
-          pp @slack_socket_url
-          @slack_socket_url
-        end
-      end
-
       def connect!(handler, auto_acknowledge: true, debug: false)
         # Should put a trap on sig INT to stop this loop
         loop do
-          endpoint = Async::HTTP::Endpoint.parse(slack_socket_url)
+          endpoint = Async::HTTP::Endpoint.parse(slack_socket_url(debug: debug))
 
           Async do
             Async::WebSocket::Client.connect(endpoint) do |socket|
               @socket = socket
               handler.on_connection
+              puts 'enter loop'
 
               while (message = socket.read)
+                puts 'read something'
                 message = JSON.parse(message.buffer)
-                if auto_acknowledge
-                  next unless message['envelope_id']
-
-                  # Acknowledge receipt of message
-                  # https://api.slack.com/apis/connections/socket-implement#acknowledge
-                  socket.write({ envelope_id: message['envelope_id'] }.to_json)
-                  socket.flush
-                else
-                  puts 'NO ACK'
-                end
+                acknowledge_message(message['envelope_id']) if auto_acknowledge
 
                 case message['type']
                 when 'hello'
@@ -81,6 +58,32 @@ module Slack
         @socket.write(payload.to_json)
         @socket.flush
       end
+
+      private
+
+      def acknowledge_message(envelope_id)
+        return if envelope_id.nil?
+
+        # Acknowledge receipt of message
+        # https://api.slack.com/apis/connections/socket-implement#acknowledge
+        socket.write({ envelope_id: envelope_id }.to_json)
+        socket.flush
+      end
+
+      def slack_socket_url(debug: false)
+        url = nil
+        Async do
+          client = Async::HTTP::Internet.new
+          response = client.post('https://slack.com/api/apps.connections.open',
+                                 [['accept', 'application/json'], ['authorization', "Bearer #{Slack::Config.token}"]])
+          url = JSON.parse(response.read)['url']
+        ensure
+          client.close
+        end
+        url += '&debug_reconnects=true' if debug
+        url
+      end
+
     end
   end
 end
